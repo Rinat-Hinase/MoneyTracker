@@ -1,0 +1,29 @@
+{
+  "name": "money-tracker-app",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.7.19",
+    "@heroicons/react": "^2.2.0",
+    "axios": "^1.6.7",
+    "chart.js": "^4.4.9",
+    "date-fns": "^4.1.0",
+    "firebase": "^11.8.1",
+    "html2canvas": "^1.4.1",
+    "react": "^18.2.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-datepicker": "^8.4.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.2.0"
+  }
+}
