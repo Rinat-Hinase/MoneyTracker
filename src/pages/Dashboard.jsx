@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../services/firebaseConfig";
+
+// Gráficas externas
 import BalanceDiario from "../components/graficas/BalanceDiario";
-import TotalesPorDia from "../components/graficas/TotalesPorDia.jsx";
+import TotalesPorDia from "../components/graficas/TotalesPorDia";
 import DistribucionMovimientos from "../components/graficas/DistribucionMovimientos";
 import TopDeudores from "../components/graficas/TopDeudores";
 import HistorialPagosSemanal from "../components/graficas/HistorialPagosSemanal";
@@ -41,7 +43,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-6 pb-6 max-w-screen-2xl mx-auto px-4">
         <h2 className="text-2xl font-bold">Panel Principal</h2>
 
         {user && (
@@ -59,13 +61,15 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Gráficas en dos columnas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* 📊 Gráficas organizadas en grid responsive */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 gap-y-10">
           <BalanceDiario />
           <TotalesPorDia />
           <DistribucionMovimientos />
           <TopDeudores />
-          <HistorialPagosSemanal />
+          <div className="md:col-span-2">
+            <HistorialPagosSemanal />
+          </div>
         </div>
       </div>
     </Layout>

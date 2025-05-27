@@ -100,76 +100,92 @@ export default function MovimientosSemanales() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto p-4">
-        <h2 className="text-3xl font-bold mb-6">📊 Estado de Cuenta Semanal</h2>
+      <div className="max-w-4xl mx-auto px-4 py-6">
+  <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">📊 Estado de Cuenta Semanal</h2>
 
-        <div className="mb-6 flex gap-4 items-center">
-          <span className="font-medium">📅 Selecciona una fecha:</span>
-          <DatePicker
-            selected={fechaSeleccionada}
-            onChange={(date) => setFechaSeleccionada(date)}
-            className="border px-3 py-1 rounded shadow-sm"
-          />
-          <button
-            onClick={generarImagen}
-            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
-          >
-            🖨️ Imprimir resumen
-          </button>
-        </div>
+  {/* Fecha y botón */}
+  <div className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+    <div className="flex items-center gap-2">
+      <span className="font-medium text-sm sm:text-base">📅 Fecha:</span>
+      <DatePicker
+        selected={fechaSeleccionada}
+        onChange={(date) => setFechaSeleccionada(date)}
+        className="border px-3 py-1 rounded shadow-sm text-sm"
+      />
+    </div>
+    <button
+      onClick={generarImagen}
+      className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 text-sm"
+    >
+      🖨️ Imprimir resumen
+    </button>
+  </div>
 
-        <div ref={refResumen} className="bg-white p-6 rounded shadow space-y-6 border">
-          <h3 className="text-xl font-bold text-center">
-            Semana del {inicioSemana.toLocaleDateString()} al {finSemana.toLocaleDateString()}
-          </h3>
+  <div ref={refResumen} className="bg-white p-4 sm:p-6 rounded shadow space-y-6 border text-sm sm:text-base overflow-auto">
+    <h3 className="text-lg sm:text-xl font-bold text-center">
+      Semana del {inicioSemana.toLocaleDateString()} al {finSemana.toLocaleDateString()}
+    </h3>
 
-          <div className="text-center text-gray-700">
-            <p>💼 Total antes de la semana: <strong>${totalInicial.toLocaleString()}</strong></p>
-            <p>💼 Total después de la semana: <strong>${totalFinal.toLocaleString()}</strong></p>
-          </div>
+    {/* Totales */}
+    <div className="text-center text-gray-700 space-y-1">
+      <p>💼 Total antes de la semana: <strong>${totalInicial.toLocaleString()}</strong></p>
+      <p>💼 Total después de la semana: <strong>${totalFinal.toLocaleString()}</strong></p>
+    </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            <section>
-              <h4 className="font-semibold text-lg mb-2 text-green-600">💰 Ingresos</h4>
-              <ul className="space-y-2">
-                {ingresos.length === 0 ? <li className="text-gray-500">Sin registros</li> :
-                  ingresos.map((i, idx) => (
-                    <li key={idx} className="text-sm">
-                      <span className="font-medium">{i.descripcion}</span> - ${i.monto.toLocaleString()}<br />
-                      <span className="text-xs text-gray-500">{i.fecha.toDate().toLocaleDateString()}</span>
-                    </li>
-                  ))}
-              </ul>
-            </section>
+    {/* Ingresos y Egresos */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+      <section>
+        <h4 className="font-semibold text-base sm:text-lg mb-2 text-green-600">💰 Ingresos</h4>
+        <ul className="space-y-2">
+          {ingresos.length === 0 ? (
+            <li className="text-gray-500">Sin registros</li>
+          ) : (
+            ingresos.map((i, idx) => (
+              <li key={idx}>
+                <span className="font-medium">{i.descripcion}</span> - ${i.monto.toLocaleString()}<br />
+                <span className="text-xs text-gray-500">{i.fecha.toDate().toLocaleDateString()}</span>
+              </li>
+            ))
+          )}
+        </ul>
+      </section>
 
-            <section>
-              <h4 className="font-semibold text-lg mb-2 text-red-600">💸 Egresos</h4>
-              <ul className="space-y-2">
-                {egresos.length === 0 ? <li className="text-gray-500">Sin registros</li> :
-                  egresos.map((e, idx) => (
-                    <li key={idx} className="text-sm">
-                      <span className="font-medium">{e.descripcion}</span> - ${e.monto.toLocaleString()}<br />
-                      <span className="text-xs text-gray-500">{e.fecha.toDate().toLocaleDateString()}</span>
-                    </li>
-                  ))}
-              </ul>
-            </section>
-          </div>
+      <section>
+        <h4 className="font-semibold text-base sm:text-lg mb-2 text-red-600">💸 Egresos</h4>
+        <ul className="space-y-2">
+          {egresos.length === 0 ? (
+            <li className="text-gray-500">Sin registros</li>
+          ) : (
+            egresos.map((e, idx) => (
+              <li key={idx}>
+                <span className="font-medium">{e.descripcion}</span> - ${e.monto.toLocaleString()}<br />
+                <span className="text-xs text-gray-500">{e.fecha.toDate().toLocaleDateString()}</span>
+              </li>
+            ))
+          )}
+        </ul>
+      </section>
+    </div>
 
-          <section>
-            <h4 className="font-semibold text-lg mb-2 text-indigo-600">📄 Historial de Deudores</h4>
-            <ul className="space-y-2">
-              {pagos.length === 0 ? <li className="text-gray-500">Sin movimientos</li> :
-                pagos.map((p, idx) => (
-                  <li key={idx} className="text-sm">
-                    <span className="font-medium">{p.tipo}</span> - {p.nombre} - ${p.monto.toLocaleString()}<br />
-                    <span className="text-xs text-gray-500">{p.fecha.toDate().toLocaleDateString()}</span>
-                  </li>
-                ))}
-            </ul>
-          </section>
-        </div>
-      </div>
+    {/* Pagos / historial */}
+    <section>
+      <h4 className="font-semibold text-base sm:text-lg mb-2 text-indigo-600">📄 Historial de Deudores</h4>
+      <ul className="space-y-2">
+        {pagos.length === 0 ? (
+          <li className="text-gray-500">Sin movimientos</li>
+        ) : (
+          pagos.map((p, idx) => (
+            <li key={idx}>
+              <span className="font-medium">{p.tipo}</span> - {p.nombre} - ${p.monto.toLocaleString()}<br />
+              <span className="text-xs text-gray-500">{p.fecha.toDate().toLocaleDateString()}</span>
+            </li>
+          ))
+        )}
+      </ul>
+    </section>
+  </div>
+</div>
+
     </Layout>
   );
 }

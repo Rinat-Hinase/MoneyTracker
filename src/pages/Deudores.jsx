@@ -222,7 +222,9 @@ export default function Deudores() {
           </button>
         </div>
 
-        <table className="min-w-full text-sm text-left text-gray-700 bg-white shadow rounded">
+        <div className="overflow-auto rounded-md shadow">
+  <table className="min-w-full text-xs sm:text-sm text-left text-gray-700 bg-white">
+
           <thead className="text-xs uppercase bg-gray-100 border-b">
             <tr>
               <th className="px-6 py-3">Nombre</th>
@@ -288,6 +290,7 @@ export default function Deudores() {
               ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Modal de pago */}
