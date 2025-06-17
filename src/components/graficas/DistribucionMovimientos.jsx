@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db, auth } from "../../services/firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -19,34 +19,35 @@ export default function DistribucionMovimientos() {
       const uid = auth.currentUser?.uid;
       if (!uid) return;
 
-      const [ingresosSnap, egresosSnap, deudoresSnap] = await Promise.all([
-        getDocs(collection(db, "ingresos")),
-        getDocs(collection(db, "egresos")),
-        getDocs(collection(db, "deudores")),
-      ]);
+      const q = query(collection(db, "movimientos"), where("usuario_id", "==", uid));
+      const snap = await getDocs(q);
+      const movimientos = snap.docs.map(doc => doc.data());
 
-      const ingresos = ingresosSnap.docs.filter(doc => doc.data().usuario_id === uid);
-      const egresos = egresosSnap.docs.filter(doc => doc.data().usuario_id === uid);
+      let ingresosManual = 0;
+      let pagosRecibidos = 0;
+      let egresos = 0;
+      let prestamos = 0;
 
-      let pagos = 0;
-      let aumentos = 0;
-
-      for (const deudor of deudoresSnap.docs) {
-        const data = deudor.data();
-        if (data.usuario_id !== uid) continue;
-
-        const historialSnap = await getDocs(collection(db, "deudores", deudor.id, "historial"));
-        historialSnap.forEach(h => {
-          const hdata = h.data();
-          if (hdata.tipo === "pago") pagos += hdata.monto;
-          if (hdata.tipo === "aumento") aumentos += hdata.monto;
-        });
-      }
+      movimientos.forEach(m => {
+        if (m.tipo === "ingreso") {
+          if (m.descripcion?.toLowerCase().includes("pago a")) {
+            pagosRecibidos += m.monto;
+          } else {
+            ingresosManual += m.monto;
+          }
+        } else if (m.tipo === "egreso") {
+          if (m.descripcion?.toLowerCase().includes("deuda")) {
+            prestamos += m.monto;
+          } else {
+            egresos += m.monto;
+          }
+        }
+      });
 
       const datos = {
         labels: ["Ingresos manuales", "Pagos recibidos", "Egresos", "Préstamos"],
         datasets: [{
-          data: [ingresos.reduce((a, b) => a + b.data().monto, 0), pagos, egresos.reduce((a, b) => a + b.data().monto, 0), aumentos],
+          data: [ingresosManual, pagosRecibidos, egresos, prestamos],
           backgroundColor: ["#22c55e", "#3b82f6", "#ef4444", "#facc15"],
           borderColor: "#fff",
           borderWidth: 1,

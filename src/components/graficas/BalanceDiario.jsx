@@ -20,6 +20,8 @@ import {
   doc,
   collection,
   getDocs,
+  query,
+  where
 } from "firebase/firestore";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend);
@@ -40,29 +42,11 @@ export default function BalanceDiario() {
       const inicioSemana = startOfWeek(hoy, { weekStartsOn: 1 });
       const dias = [...Array(7)].map((_, i) => addDays(inicioSemana, i));
 
-      const ingresosSnap = await getDocs(collection(db, "ingresos"));
-      const egresosSnap = await getDocs(collection(db, "egresos"));
-      const deudoresSnap = await getDocs(collection(db, "deudores"));
+      const movimientosRef = collection(db, "movimientos");
+      const q = query(movimientosRef, where("usuario_id", "==", uid));
+      const movimientosSnap = await getDocs(q);
 
-      const movimientos = [];
-
-      for (const d of ingresosSnap.docs) {
-        const data = d.data();
-        if (data.usuario_id === uid) movimientos.push({ ...data, tipo: "ingreso" });
-      }
-      for (const d of egresosSnap.docs) {
-        const data = d.data();
-        if (data.usuario_id === uid) movimientos.push({ ...data, tipo: "egreso" });
-      }
-      for (const deudor of deudoresSnap.docs) {
-        const data = deudor.data();
-        if (data.usuario_id !== uid) continue;
-        const historialSnap = await getDocs(collection(db, "deudores", deudor.id, "historial"));
-        historialSnap.forEach((m) => {
-          const mov = m.data();
-          movimientos.push({ ...mov, tipo: mov.tipo, fecha: mov.fecha, nombre: data.nombre });
-        });
-      }
+      const movimientos = movimientosSnap.docs.map((doc) => doc.data());
 
       const resultado = dias.map((dia) => {
         const fecha = format(dia, "yyyy-MM-dd");
@@ -70,8 +54,8 @@ export default function BalanceDiario() {
         movimientos.forEach((m) => {
           const mFecha = format(m.fecha.toDate(), "yyyy-MM-dd");
           if (mFecha === fecha) {
-            if (m.tipo === "ingreso" || m.tipo === "pago") delta += m.monto;
-            if (m.tipo === "egreso" || m.tipo === "aumento") delta -= m.monto;
+            if (m.tipo === "ingreso") delta += m.monto;
+            if (m.tipo === "egreso") delta -= m.monto;
           }
         });
         return { fecha, delta };

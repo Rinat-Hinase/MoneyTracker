@@ -5,7 +5,7 @@ import Layout from "../components/Layout";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../services/firebaseConfig";
 
-// Gráficas externas
+// 📊 Gráficas conectadas a colección `movimientos`
 import BalanceDiario from "../components/graficas/BalanceDiario";
 import TotalesPorDia from "../components/graficas/TotalesPorDia";
 import DistribucionMovimientos from "../components/graficas/DistribucionMovimientos";
@@ -31,11 +31,7 @@ export default function Dashboard() {
     try {
       const ref = doc(db, "cuentas", uid);
       const snap = await getDoc(ref);
-      if (snap.exists()) {
-        setTotalCuenta(snap.data().total || 0);
-      } else {
-        setTotalCuenta(0);
-      }
+      setTotalCuenta(snap.exists() ? snap.data().total || 0 : 0);
     } catch (err) {
       console.error("Error al obtener total:", err);
     }

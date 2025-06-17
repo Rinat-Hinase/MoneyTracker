@@ -15,26 +15,19 @@ export default function TotalesPorDia() {
     if (!uid) return;
 
     const fetchData = async () => {
-      const ingresosSnap = await getDocs(collection(db, "ingresos"));
-      const egresosSnap = await getDocs(collection(db, "egresos"));
+      const movimientosSnap = await getDocs(collection(db, "movimientos"));
       const deudoresSnap = await getDocs(collection(db, "deudores"));
 
       const fechas = Array.from({ length: 7 }, (_, i) => subDays(new Date(), 6 - i));
 
-      const ingresos = ingresosSnap.docs
-        .map(doc => doc.data())
-        .filter(d => d.usuario_id === uid);
-
-      const egresos = egresosSnap.docs
+      const movimientos = movimientosSnap.docs
         .map(doc => doc.data())
         .filter(d => d.usuario_id === uid);
 
       const pagos = [];
-
       for (const d of deudoresSnap.docs) {
         const data = d.data();
         if (data.usuario_id !== uid) continue;
-
         const subRef = collection(db, "deudores", d.id, "historial");
         const subSnap = await getDocs(subRef);
         subSnap.forEach(mov => {
@@ -46,12 +39,12 @@ export default function TotalesPorDia() {
       }
 
       const formateado = fechas.map((fecha) => {
-        const totalIngresos = ingresos
-          .filter(d => isSameDay(d.fecha.toDate(), fecha))
+        const totalIngresos = movimientos
+          .filter(d => d.tipo === "ingreso" && isSameDay(d.fecha.toDate(), fecha))
           .reduce((acc, d) => acc + d.monto, 0);
 
-        const totalEgresos = egresos
-          .filter(d => isSameDay(d.fecha.toDate(), fecha))
+        const totalEgresos = movimientos
+          .filter(d => d.tipo === "egreso" && isSameDay(d.fecha.toDate(), fecha))
           .reduce((acc, d) => acc + d.monto, 0);
 
         const totalPagos = pagos

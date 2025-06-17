@@ -1,10 +1,11 @@
-// src/components/ProtectedRoute.jsx
-import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../services/firebaseConfig";
-
 export default function ProtectedRoute({ children }) {
+  // 🔥 DEV MODE: siempre pasa como autenticado
+  const devMode = true;
+
+  if (devMode) {
+    return children;
+  }
+
   const [cargando, setCargando] = useState(true);
   const [usuarioAutenticado, setUsuarioAutenticado] = useState(false);
 
